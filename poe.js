@@ -2,6 +2,11 @@ const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
+const primarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0';
+const secondarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa';
+const minNumberOfItems = 3;
+const minNumberOfItemsBig = 7;
+
 let scraped_name = [];
 let scraped_data = {};
 (async () => {
@@ -17,7 +22,7 @@ let scraped_data = {};
         } catch {
             console.log('Initializing setup...');
         }
-        await page.goto('https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0', { timeout: 180000 })
+        await page.goto(primarySearchURL, { timeout: 180000 })
         await delay(1000)
         const noUserStatus = await page.$('.login-dialog')
 
@@ -44,7 +49,7 @@ let scraped_data = {};
             const cookiesString = await fs.readFile('./cookies.json');
             const sesCookies = JSON.parse(cookiesString);
             await page.setCookie(...sesCookies);
-            await page.goto('https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0', { timeout: 180000 })
+            await page.goto(primarySearchURL, { timeout: 180000 })
         }
 
 
@@ -95,7 +100,7 @@ let scraped_data = {};
         for (const accName of scraped_name) {
             console.log(`running for ${accName.name}, #${place}.`);
             place++;
-            await page.goto('https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa', { timeout: 180000 })
+            await page.goto(secondarySearchURL, { timeout: 180000 })
             await page.waitForSelector('.toggle-search-btn')
             await delay(400)
             await page.click('.toggle-search-btn')
@@ -116,11 +121,11 @@ let scraped_data = {};
                 let pageURL = page.url();
                 numberVal = Number(numberVal.split(" ")[1])
                 // Console Log if this user has more than 2 EDs
-                if (numberVal > 2 && numberVal < 7) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
-                if (numberVal >= 7) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 scraped_data[accName.name] = numberVal
             } catch {
-                console.log(`${accName.name} Unlisted`);
+                console.log(`${accName.name} unlisted.`);
             }
             await delay(800)
         }
