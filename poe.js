@@ -33,7 +33,7 @@ let itemName = '';
         await delay(1000)
         const noUserStatus = await page.$('.login-dialog')
 
-        // User not signed-in flow
+        // User not signed-in flow, currently only works with Steam.
         if (noUserStatus) {
             console.log('WARNING: User action required, must sign-in with Steam.');
             await browser.close();
@@ -46,8 +46,7 @@ let itemName = '';
             await page.click('.btn_green_white_innerfade')
             await page.waitForSelector('.btn_grey_white_innerfade')
             await page.click('.btn_grey_white_innerfade')
-            await delay(1000);
-            await page.waitForSelector('.profile')
+            await page.waitForSelector('.profile', { timeout: 180000 })
             const cookies = await page.cookies();
             await fs.writeFile('cookies.json', JSON.stringify(cookies, null, 2));
             await browser.close();
@@ -96,14 +95,20 @@ let itemName = '';
         scraped_name.splice(0, 1)
         console.log('Results: ', scraped_name, `Total number of users is ${scraped_name.length}.`);
 
-        // Toggle the trade filter selector
-        await page.goto('https://www.pathofexile.com/trade/search/Sanctum', { timeout: 180000 })
+        // Check and toggle the trade filter selector
+        await page.goto(secondarySearchURL, { timeout: 180000 })
+        await page.waitForSelector('.toggle-search-btn')
+        await delay(400)
+        await page.click('.toggle-search-btn')
         await delay(1000)
         await page.waitForSelector('.filter-group:nth-child(9) button')
         await delay(500)
-        let pageSelector = '.filter-group:nth-child(9) button'
-        await page.evaluate((pageSelector) => document.querySelector(pageSelector).click(), pageSelector)
-        await delay(500)
+        let filterStatusExpanded = await page.$('.filter-group:nth-child(9).expanded')
+        if (!filterStatusExpanded) {
+            let pageSelector = '.filter-group:nth-child(9) button'
+            await page.evaluate((pageSelector) => document.querySelector(pageSelector).click(), pageSelector)
+            await delay(500)
+        }
 
         // Check all users individually
         let place = 0;
