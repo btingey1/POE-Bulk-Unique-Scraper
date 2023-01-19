@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
 
-// Primary link is for inital search of users, secondary link is for individualized search of users (can be the same link)
+// Primary link is for inital search of users, secondary link is for individualized search of users (can be the same link), ensure collapse listings by account is on for primary link
 const primarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0';
 const secondarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa';
 // These are the threshold minimum items for each kind of alert (normal and big)
@@ -13,6 +13,7 @@ const minNumberOfItemsBig = 7;
 // Initializing our data containers
 let scraped_name = [];
 let scraped_data = {};
+let itemName = '';
 
 // App start
 (async () => {
@@ -60,8 +61,11 @@ let scraped_data = {};
 
 
         // Find our 100 Users
-        console.log('Searching...');
         await page.waitForSelector('.character-name')
+        let bodyHTML = await page.evaluate(() => document.body.innerHTML);
+        let $ = cheerio.load(bodyHTML);
+        itemName = $('.itemName').first().find('span').text();
+        console.log(`Searching for ${itemName}...`);
         await page.evaluate(() => new Promise((resolve) => {
             let incrementer = 0;
             var scrollTop = -1;
@@ -82,8 +86,8 @@ let scraped_data = {};
         }));
 
         // Grab their names
-        let bodyHTML = await page.evaluate(() => document.body.innerHTML);
-        let $ = cheerio.load(bodyHTML);
+        bodyHTML = await page.evaluate(() => document.body.innerHTML);
+        $ = cheerio.load(bodyHTML);
         let profileLinkEl = $('.profile-link')
         profileLinkEl.each((index, element) => {
             thisName = $(element).find('a').text()
@@ -127,8 +131,8 @@ let scraped_data = {};
                 let pageURL = page.url();
                 numberVal = Number(numberVal.split(" ")[1])
                 // Console Log if this user has more than x items
-                if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
-                if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} ${itemName}s listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} ${itemName}s listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 scraped_data[accName.name] = numberVal
             } catch {
                 console.log(`${accName.name} unlisted.`);
@@ -137,7 +141,7 @@ let scraped_data = {};
         }
         // Return ordered array of all users
         let sortedVals = Object.entries(scraped_data).sort((a, b) => b[1] - a[1]);
-        console.log(sortedVals);
+        console.log('Results: ', sortedVals);
     }
     catch (err) {
         console.log(err);
