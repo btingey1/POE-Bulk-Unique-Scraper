@@ -2,13 +2,19 @@ const cheerio = require('cheerio');
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
+
+// Primary link is for inital search of users, secondary search is for individualized search of users. Can be same link
 const primarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0';
 const secondarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa';
+// These are the threshold minimum items for each kind of alert (normal and big).
 const minNumberOfItems = 3;
 const minNumberOfItemsBig = 7;
 
+// Initializing our data containers
 let scraped_name = [];
 let scraped_data = {};
+
+// App start
 (async () => {
     var browser = await puppeteer.launch({ headless: true });
     var page = await browser.newPage();
