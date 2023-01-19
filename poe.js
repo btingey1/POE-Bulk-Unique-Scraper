@@ -3,10 +3,10 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
 
-// Primary link is for inital search of users, secondary link is for individualized search of users. Can be the same link.
+// Primary link is for inital search of users, secondary link is for individualized search of users (can be the same link)
 const primarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0';
 const secondarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa';
-// These are the threshold minimum items for each kind of alert (normal and big).
+// These are the threshold minimum items for each kind of alert (normal and big)
 const minNumberOfItems = 3;
 const minNumberOfItemsBig = 7;
 
@@ -135,14 +135,17 @@ let scraped_data = {};
             }
             await delay(800)
         }
+        // Return ordered array of all users
         let sortedVals = Object.entries(scraped_data).sort((a, b) => b[1] - a[1]);
         console.log(sortedVals);
     }
     catch (err) {
         console.log(err);
+        // Return ordered array of all users after error message
         let sortedVals = Object.entries(scraped_data).sort((a, b) => b[1] - a[1]);
         console.log(sortedVals);
     }
+    // End session
     await browser.close();
     console.log('Search complete.');
 })();
