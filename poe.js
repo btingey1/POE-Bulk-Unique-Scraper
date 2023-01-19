@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
 
 
-// Primary link is for inital search of users, secondary search is for individualized search of users. Can be same link
+// Primary link is for inital search of users, secondary link is for individualized search of users. Can be the same link.
 const primarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0';
 const secondarySearchURL = 'https://www.pathofexile.com/trade/search/Sanctum/5BPq0weTa';
 // These are the threshold minimum items for each kind of alert (normal and big).
@@ -20,7 +20,7 @@ let scraped_data = {};
     var page = await browser.newPage();
     console.log('Starting...');
     try {
-        // Login Flow
+        // Login flow
         const cookiesString = await fs.readFile('./cookies.json');
         try {
             const cookies = JSON.parse(cookiesString);
@@ -32,7 +32,7 @@ let scraped_data = {};
         await delay(1000)
         const noUserStatus = await page.$('.login-dialog')
 
-        // User Not Signed-In Flow
+        // User not signed-in flow
         if (noUserStatus) {
             console.log('WARNING: User action required, must sign-in with Steam.');
             await browser.close();
@@ -81,7 +81,7 @@ let scraped_data = {};
             }, 200);
         }));
 
-        // Grab Their Names
+        // Grab their names
         let bodyHTML = await page.evaluate(() => document.body.innerHTML);
         let $ = cheerio.load(bodyHTML);
         let profileLinkEl = $('.profile-link')
@@ -115,7 +115,7 @@ let scraped_data = {};
             await page.type('.form-control.text', accName.name);
             await page.click('.btn.search-btn')
 
-            // Try and see if user with thisn item exists
+            // Try and see if user with this item exists
             try {
                 await page.waitForSelector('.character-name', { timeout: 2000 })
                 // Check their login / AFK status
@@ -126,7 +126,7 @@ let scraped_data = {};
                 let numberVal = $(numberListings).find('h3').text()
                 let pageURL = page.url();
                 numberVal = Number(numberVal.split(" ")[1])
-                // Console Log if this user has more than 2 EDs
+                // Console Log if this user has more than x items.
                 if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 scraped_data[accName.name] = numberVal
