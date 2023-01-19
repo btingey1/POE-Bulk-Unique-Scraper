@@ -90,7 +90,7 @@ let scraped_data = {};
             scraped_name.push({ 'name': thisName })
         })
         scraped_name.splice(0, 1)
-        console.log(scraped_name, `Total number of users is ${scraped_name.length}.`);
+        console.log('Results: ', scraped_name, `Total number of users is ${scraped_name.length}.`);
 
         // Toggle the trade filter selector
         await page.goto('https://www.pathofexile.com/trade/search/Sanctum', { timeout: 180000 })
@@ -143,7 +143,7 @@ let scraped_data = {};
         console.log(err);
         // Return ordered array of all users after error message
         let sortedVals = Object.entries(scraped_data).sort((a, b) => b[1] - a[1]);
-        console.log(sortedVals);
+        console.log('Results: ', sortedVals);
     }
     // End session
     await browser.close();
