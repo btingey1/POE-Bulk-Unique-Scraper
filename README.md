@@ -1,4 +1,4 @@
-# Poe-Trade-Project
+# POE-Bulk-Unique-Scraper
 
 To use this script:
 
