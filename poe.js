@@ -136,8 +136,8 @@ let itemName = '';
                 let pageURL = page.url();
                 numberVal = Number(numberVal.split(" ")[1])
                 // Console Log if this user has more than x items
-                if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} ${itemName}s listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
-                if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} ${itemName}s listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} ${itemName}${checkStringEnd(itemName)} listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} ${itemName}${checkStringEnd(itemName)} listed by '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 scraped_data[accName.name] = numberVal
             } catch {
                 console.log(`${accName.name} unlisted.`);
@@ -159,7 +159,7 @@ let itemName = '';
     console.log('Search complete.');
 })();
 
-
+// Helper functions
 function delay(time) {
     return new Promise(function (resolve) {
         setTimeout(resolve, time)
@@ -169,4 +169,10 @@ function delay(time) {
 function checkStatus(currentStatus) {
     if (currentStatus) return 'away'
     return 'online'
+}
+
+function checkStringEnd(str) {
+    let lastChar = str.slice(-1).toLowerCase();
+    if (lastChar == 's') return ''
+    return 's'
 }
