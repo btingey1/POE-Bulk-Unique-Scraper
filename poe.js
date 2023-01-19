@@ -126,7 +126,7 @@ let scraped_data = {};
                 let numberVal = $(numberListings).find('h3').text()
                 let pageURL = page.url();
                 numberVal = Number(numberVal.split(" ")[1])
-                // Console Log if this user has more than x items.
+                // Console Log if this user has more than x items
                 if (numberVal >= minNumberOfItems && numberVal < minNumberOfItemsBig) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 if (numberVal >= minNumberOfItemsBig) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
                 scraped_data[accName.name] = numberVal
