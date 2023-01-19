@@ -15,15 +15,15 @@ let scraped_data = {};
             const cookies = JSON.parse(cookiesString);
             await page.setCookie(...cookies);
         } catch {
-            console.log('Initializing Setup.');
+            console.log('Initializing setup...');
         }
         await page.goto('https://www.pathofexile.com/trade/search/Sanctum/pgda63ei0', { timeout: 180000 })
-        await delay(2000)
+        await delay(1000)
         const noUserStatus = await page.$('.login-dialog')
 
         // User Not Signed-In Flow
         if (noUserStatus) {
-            console.log('WARNING: No Login Status. Must Sign-in with Steam.');
+            console.log('WARNING: User action required, must sign-in with Steam.');
             await browser.close();
             var browser = await puppeteer.launch({ headless: false });
             var page = await browser.newPage();
@@ -112,15 +112,13 @@ let scraped_data = {};
                 let bodyHTML = await page.evaluate(() => document.body.innerHTML);
                 let $ = cheerio.load(bodyHTML);
                 let numberListings = $('.row-total')
-                numberListings.each((index, element) => {
-                    let numberVal = $(element).find('h3').text()
-                    let pageURL = page.url();
-                    numberVal = Number(numberVal.split(" ")[1])
-                    // Console Log if this user has more than 2 EDs
-                    if (numberVal > 2 && numberVal < 7) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
-                    if (numberVal >= 7) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
-                    scraped_data[accName.name] = numberVal
-                })
+                let numberVal = $(numberListings).find('h3').text()
+                let pageURL = page.url();
+                numberVal = Number(numberVal.split(" ")[1])
+                // Console Log if this user has more than 2 EDs
+                if (numberVal > 2 && numberVal < 7) console.log(`ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                if (numberVal >= 7) console.log(`🚨 BIG ALERT: ${numberVal} Eternal Damnations from '${accName.name}'. They are ${checkStatus(status)}. Goto: ${pageURL}.`);
+                scraped_data[accName.name] = numberVal
             } catch {
                 console.log(`${accName.name} Unlisted`);
             }
@@ -135,6 +133,7 @@ let scraped_data = {};
         console.log(sortedVals);
     }
     await browser.close();
+    console.log('Search complete.');
 })();
 
 
