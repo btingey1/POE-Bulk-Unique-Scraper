@@ -21,12 +21,13 @@ let itemName = '';
     var page = await browser.newPage();
     console.log('Starting...');
     try {
-        // Login flow
-        const cookiesString = await fs.readFile('./cookies.json');
+        // Check cookies / cookies file exists or to create cookies
         try {
+            const cookiesString = await fs.readFile('./cookies.json');
             const cookies = JSON.parse(cookiesString);
             await page.setCookie(...cookies);
         } catch {
+            await fs.writeFile('./cookies.json', [])
             console.log('Initializing setup...');
         }
         await page.goto(primarySearchURL, { timeout: 180000 })
@@ -35,19 +36,12 @@ let itemName = '';
 
         // User not signed-in flow
         if (noUserStatus) {
-            console.log('WARNING: User action required, must sign-in with Steam.');
+            console.log('WARNING: User action required, must sign-in 🚨');
             await browser.close();
             var browser = await puppeteer.launch({ headless: false });
             var page = await browser.newPage();
-            await page.goto('https://www.pathofexile.com/login', { timeout: 180000 })
-            // Comment out from here to line -> page.click('.btn_grey_white_innerfade') - currently line 49 - to login with method other than steam
-            await page.waitForSelector(".login-button-group")
-            await page.click('.login-button-group:nth-child(1)')
-            await page.waitForSelector('.btn_green_white_innerfade')
-            await page.click('.btn_green_white_innerfade')
-            await page.waitForSelector('.btn_grey_white_innerfade')
-            await page.click('.btn_grey_white_innerfade')
-            await page.waitForSelector('.profile', { timeout: 180000 })
+            await page.goto('https://www.pathofexile.com/trade/search/Sanctum', { timeout: 180000 })
+            await page.waitForSelector('.loggedInStatus', { timeout: 180000 })
             const cookies = await page.cookies();
             await fs.writeFile('cookies.json', JSON.stringify(cookies, null, 2));
             await browser.close();
