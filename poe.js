@@ -33,13 +33,14 @@ let itemName = '';
         await delay(1000)
         const noUserStatus = await page.$('.login-dialog')
 
-        // User not signed-in flow, currently only works with Steam.
+        // User not signed-in flow
         if (noUserStatus) {
             console.log('WARNING: User action required, must sign-in with Steam.');
             await browser.close();
             var browser = await puppeteer.launch({ headless: false });
             var page = await browser.newPage();
-            await page.goto('https://www.pathofexile.com/trade/', { timeout: 180000 })
+            await page.goto('https://www.pathofexile.com/login', { timeout: 180000 })
+            // Comment out from here to line -> page.click('.btn_grey_white_innerfade') - currently line 49 - to login with method other than steam
             await page.waitForSelector(".login-button-group")
             await page.click('.login-button-group:nth-child(1)')
             await page.waitForSelector('.btn_green_white_innerfade')
