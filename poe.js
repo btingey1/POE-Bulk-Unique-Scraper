@@ -114,7 +114,7 @@ let itemName = '';
             await page.waitForSelector('.toggle-search-btn')
             await delay(400)
             await page.click('.toggle-search-btn')
-            await delay(8000)
+            await delay(10000)
             await page.waitForSelector('.form-control.text')
             await page.type('.form-control.text', accName.name);
             await page.click('.btn.search-btn')
